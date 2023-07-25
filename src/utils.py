@@ -116,5 +116,3 @@ def user_interaction():
     for vc in vacancies:
         print(vc)
 
-
-user_interaction()
