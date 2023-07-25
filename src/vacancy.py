@@ -23,27 +23,27 @@ class Vacancy:
             raise TypeError(f"Невозможно сравнить объект типа '{_object}' с объектом другого типа.")
 
     @property
-    def employer(self):
+    def employer(self) -> str:
         return self.__employer
 
     @property
-    def currency(self):
+    def currency(self) -> str:
         return self.__currency
 
     @property
-    def experience(self):
+    def experience(self) -> str:
         return self.__experience
 
     @property
-    def salary_to(self):
+    def salary_to(self) -> str:
         return self.__salary_to
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__name
 
     @property
-    def url(self):
+    def url(self) -> str:
         return self.__url
 
     @salary_to.setter
@@ -51,7 +51,7 @@ class Vacancy:
         self.__salary_to = self.__validate_value(value)
 
     @property
-    def salary_from(self):
+    def salary_from(self) -> str:
         return self.__salary_from
 
     @salary_from.setter
@@ -59,22 +59,23 @@ class Vacancy:
         self.__salary_from = self.__validate_value(value)
 
     @property
-    def get_salary_range(self):
+    def get_salary_range(self) -> int:
         """
         Максимальное значение зарплаты
         :return: Возврат максимального значения зарплаты
         """
         return max(self.__salary_from, self.__salary_to)
 
-    def __str__(self):
-        salary_range = f"{self.salary_from} - {self.salary_to} {self.currency}" if self.salary_from is not None and self.salary_to is not None else "Не указана"
+    def __str__(self) -> str:
+        salary_range = f"{self.salary_from} - {self.salary_to} {self.currency}" \
+            if self.salary_from and self.salary_to else "Не указана"
         return f"Вакансия: {self.name}\n" \
                f"Зарплата: {salary_range}\n" \
                f"Требуемый опыт: {self.experience}\n" \
                f"Ссылка: {self.url}\n" \
                f"Работодатель: {self.employer}\n"
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         """
         Сравнение по оператору 'меньше'
         :param other: Экземпляр класса
@@ -83,7 +84,7 @@ class Vacancy:
         self.__check_compare(other, Vacancy)
         return self.get_salary_range < other.get_salary_range
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         """
         Сравнение по оператору 'больше'
         :param other: Экземпляр класса
@@ -92,7 +93,7 @@ class Vacancy:
         self.__check_compare(other, Vacancy)
         return self.get_salary_range > other.get_salary_range
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         """
         Сравнение по оператору 'равенства'
         :param other: Экземпляр класса

@@ -18,10 +18,16 @@ class VacancyEngine(ABC):
 
     @abstractmethod
     def get_vacancies(self):
+        """
+        Получение вакансий с использованием API.
+        """
         pass
 
     @abstractmethod
     def get_formatted_vacancies(self):
+        """
+        Получение отформатированных данных о вакансиях.
+        """
         pass
 
 
@@ -46,7 +52,7 @@ class HeadHunterAPI(VacancyEngine):
 
         return response.json()["items"]
 
-    def get_vacancies(self, quantity=400):
+    def get_vacancies(self, quantity: int = 400):
         pages_count = math.ceil(quantity / self.params["per_page"])
         self.quantity = quantity
         self.vacancies = []
@@ -114,7 +120,7 @@ class SuperJobAPI(VacancyEngine):
 
         return response.json()["objects"]
 
-    def get_vacancies(self, quantity=400):
+    def get_vacancies(self, quantity: int = 400):
         pages_count = math.ceil(quantity / self.params["count"])
         self.quantity = quantity
         self.params["count"] = quantity if quantity < 100 else 100
@@ -153,33 +159,3 @@ class SuperJobAPI(VacancyEngine):
             formatted_vacancies.append(formatted_vacancy)
 
         return formatted_vacancies
-
-# print(superjob_api.get_formatted_vacancies())
-
-# hh_api = HeadHunterAPI()
-# superjob_api = SuperJobAPI()
-# #
-# hh_vacancies = hh_api.get_vacancies("Python", per_page=10, filter_words=['django', 'postgresql'])
-# superjob_vacancies = superjob_api.get_vacancies("Python", per_page=10, filter_words=['django', 'postgresql'])
-# #
-#
-# # vc = Vacancy('SkyPro', 'https://hh.ru/vacancy/123456', 'Python Developer', 120000, 160000,
-# #              'Требования: опыт работы от 3 лет...',
-# #              'Минимальные требования к знаниям и навыкам для отклика:...')
-#
-# json_saver = JSONSaver()
-# for raw_vc in hh_vacancies:
-#     salary_from = 0 if raw_vc['salary'] is None else raw_vc['salary']['from']
-#     salary_to = 0 if raw_vc['salary'] is None else raw_vc['salary']['to']
-#
-#     vacancy_data = {
-#         "vc_name": raw_vc['name'],
-#         "experience": raw_vc['experience']['name'],
-#         "salary_from": salary_from,
-#         "salary_to": salary_to,
-#         "url": raw_vc['alternate_url'],
-#         "employer_name": raw_vc['employer']['name'],
-#         "requirement": raw_vc['snippet']['requirement'],
-#         "responsibility": raw_vc['snippet']['responsibility']
-#     }
-#     print(raw_vc)

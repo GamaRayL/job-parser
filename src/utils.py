@@ -1,11 +1,16 @@
+from typing import Dict
+
 from src.vacancy_api import HeadHunterAPI, SuperJobAPI
 from src.vacancy_manager import JSONSaver
 
 
-def select_variant(message, variants):
+def select_variant(message: str, variants: Dict[int, str]) -> int:
     """
+    Отображает сообщение с вариантами и получает выбор пользователя.
 
-    :return:
+    :param message: Сообщение для отображения.
+    :param variants: Словарь с номерами вариантов и соответствующими им описаниями.
+    :return: Выбранный номер варианта.
     """
 
     while True:
@@ -29,35 +34,25 @@ def select_variant(message, variants):
             continue
 
 
-# def choose_filter():
-#     is_filter = input("Отфильтровать вакансии: \n"
-#                       "1. Да\n"
-#                       "2. Нет\n")
-#
-#     while True:
-#         try:
-#             is_filter in [1, 2]
-#         except ValueError:
-#             print("Выберите вариант из ")
-#             continue
-
 def user_interaction():
     """
-
-    :return:
+    Функция для взаимодействия с пользователем по поиску работы, фильтрации и сортировке вакансий.
     """
     print("Добро пожаловать в программу для поиска вакансий!\n")
+
+    # Выбор платформы
     platform_message = "Выберите пожалуйста платформу для поиска (указав цифру):"
     platforms = {
         1: "HeadHunter",
         2: "SuperJob",
-        3: "На всех",
+        3: "На всех платформах",
         4: "Завершить программу"
     }
     select_platform = select_variant(platform_message, platforms)
+    print(f"Для поиска выбрана платформа '{platforms[select_platform]}'\n")
 
     if select_platform == 4:
-        exit()
+        return
 
     vacancies = []
     search_query = input("Введите поисковый запрос: ")
@@ -73,10 +68,10 @@ def user_interaction():
         superjob.get_vacancies(n_vc_query)
         vacancies.extend(superjob.get_formatted_vacancies())
     elif select_platform == 3:
-        for api in (hh, superjob):
-            n_half_vc = int(n_vc_query / 2)
-            api.get_vacancies(n_half_vc)
-            vacancies.extend(api.get_formatted_vacancies())
+        hh.get_vacancies(n_vc_query // 2)
+        superjob.get_vacancies(n_vc_query - len(hh.vacancies))
+        vacancies.extend(hh.get_formatted_vacancies())
+        vacancies.extend(superjob.get_formatted_vacancies())
 
     json_saver = JSONSaver()
     for vc in vacancies:
@@ -85,7 +80,7 @@ def user_interaction():
     json_saver.get_vacancies()
 
     # Фильтрация
-    filter_message = "Отфильтровать вакансии?"
+    filter_message = "Желаете отфильтровать вакансии?"
     choices = {
         1: "Да",
         2: "Нет"
@@ -93,51 +88,33 @@ def user_interaction():
     select_filter = select_variant(filter_message, choices)
 
     if select_filter == 1:
-        filter_words = input("Введите ключевые слова для фильтрации вакансий (по имени, опыту или зп): ").split()
+        filter_words = input("Введите ключевые слова для фильтрации вакансий (по имени, опыту или зарплате): ").split()
         vacancies = json_saver.filter_vacancies(filter_words)
 
-        if not vacancies:
+        if len(vacancies) == 0:
             print("Нет вакансий, соответствующих заданным критериям.")
             return
-
-    else:
-        vacancies = json_saver.get_vacancies()
+        else:
+            print("\nОтфильтрованные вакансии:\n")
+            for vc in vacancies:
+                print(vc)
+            print("\n")
 
     # Сортировка
-    sort_message = "Отсортировать вакансию по зарплате?"
+    sort_message = "Желаете отсортировать вакансии по зарплате?"
     choices = {
         1: "Да",
         2: "Нет"
     }
+    print("Сортировка будет производиться по возрастанию.")
     select_sort = select_variant(sort_message, choices)
 
     if select_sort == 1:
         vacancies = json_saver.sort_vacancies_by_salary()
-    else:
-        return vacancies
 
+    print("\nОтсортированные вакансии:\n")
     for vc in vacancies:
         print(vc)
 
 
 user_interaction()
-
-# search_query = input("Введите поисковый запрос: ")
-# top_n = int(input("Введите количество вакансий для вывода в топ N: "))
-# filter_words = input("Введите ключевые слова для фильтрации вакансий: ").split()
-# filtered_vacancies = filter_vacancies(hh_vacancies, superjob_vacancies, filter_words)
-#
-# if not filtered_vacancies:
-#     print("Нет вакансий, соответствующих заданным критериям.")
-#     return
-#
-# sorted_vacancies = sort_vacancies(filtered_vacancies)
-# top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
-# print_vacancies(top_vacancies)
-
-
-# Создать функцию для взаимодействия с пользователем. Функция должна взаимодействовать с пользователем через консоль.
-# Самостоятельно придумать сценарии и возможности взаимодействия с пользователем.
-# Например, позволять пользователю указать, с каких платформ он хочет получить вакансии,
-# ввести поисковый запрос, получить топ N вакансий по зарплате, получить вакансии в отсортированном виде,
-# получить вакансии, в описании которых есть определенные ключевые слова, например "postgres" и т. п.
