@@ -1,6 +1,6 @@
 import json
 from abc import ABC, abstractmethod
-from typing import List, Union
+from typing import List
 
 from src.vacancy import Vacancy
 
@@ -47,33 +47,33 @@ class VacancyManager(ABC):
 
 
 class JSONSaver(VacancyManager):
-    dir = './store/'
-    filename = 'vacancy.json'
-    path = dir + filename
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+
+    file_path = os.path.join(current_directory, "store", "vacancies.json")
 
     def __init__(self):
         self.vacancies: List[Vacancy] = []
 
     def check_file_exists(self):
-        if not os.path.exists(self.path) or not os.path.getsize(self.path):
+        if not os.path.exists(self.file_path) or not os.path.getsize(self.file_path):
             raise FileNotFoundError('Файл с вакансиями пуст или не существует.')
 
     def add_vacancy(self, vacancy_obj: Vacancy):
-        if os.path.exists(self.path) and os.path.getsize(self.path):
-            with open(self.path, encoding='utf8') as file:
+        if os.path.exists(self.file_path) and os.path.getsize(self.file_path):
+            with open(self.file_path, encoding='utf8') as file:
                 vc_list = json.load(file)
         else:
             vc_list = []
 
         vc_list.append(vacancy_obj)
 
-        with open(self.path, 'w', encoding='utf8') as file:
+        with open(self.file_path, 'w', encoding='utf8') as file:
             json.dump(vc_list, file, ensure_ascii=False)
 
     def get_vacancies(self) -> List[Vacancy]:
         self.check_file_exists()
 
-        with open(self.path, encoding='utf8') as file:
+        with open(self.file_path, encoding='utf8') as file:
             vc_list = json.load(file)
 
             self.vacancies = [Vacancy(vc) for vc in vc_list]
@@ -107,7 +107,7 @@ class JSONSaver(VacancyManager):
 
         self.check_file_exists()
 
-        with open(self.path, encoding='utf8') as file:
+        with open(self.file_path, encoding='utf8') as file:
             vc_list = json.load(file)
             vc_list_cleared = []
 
@@ -115,5 +115,5 @@ class JSONSaver(VacancyManager):
                 if vacancy['url'].lower() != vacancy_obj.url.lower():
                     vc_list_cleared.append(vacancy)
 
-        with open(self.path, 'w', encoding='utf8') as file:
+        with open(self.file_path, 'w', encoding='utf8') as file:
             json.dump(vc_list_cleared, file, ensure_ascii=False)
