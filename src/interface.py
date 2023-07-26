@@ -46,7 +46,7 @@ def user_interaction():
     for vc in vacancies:
         json_saver.add_vacancy(vc)
 
-    json_saver.get_vacancies()
+    vacancies = json_saver.get_vacancies()
 
     # Фильтрация
     filter_message = "Желаете отфильтровать вакансии?"
