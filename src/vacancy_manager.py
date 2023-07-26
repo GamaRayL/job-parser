@@ -87,19 +87,21 @@ class JSONSaver(VacancyManager):
 
         params_lower = [param.lower() if isinstance(param, str) else param for param in params]
 
-        vacancies = []
+        filtered_vacancies = []
 
         for vc in self.vacancies:
             vc_attrs = [vc.name.lower(), vc.experience.lower(), str(vc.salary_from), str(vc.salary_to)]
             if any(param in attr for param in params_lower for attr in vc_attrs):
-                vacancies.append(vc)
+                filtered_vacancies.append(vc)
 
-        self.vacancies = vacancies
+        self.vacancies = filtered_vacancies
         return self.vacancies
 
     def sort_vacancies_by_salary(self) -> List[Vacancy]:
         sorted_vacancies = sorted(self.vacancies, key=lambda vc: max(vc.salary_from or 0, vc.salary_to or 0))
-        return sorted_vacancies
+
+        self.vacancies = sorted_vacancies
+        return self.vacancies
 
     def delete_vacancy(self, vacancy_obj: Vacancy):
         if vacancy_obj is None:
